@@ -1,0 +1,12 @@
+services:
+  experiences-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./src:/server/src
+    command: npm start
