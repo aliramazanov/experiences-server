@@ -7,10 +7,7 @@
     "debug": "ndb server.js",
     "clean": "rm -rf dist",
     "build": "npm run clean && npx tsc",
-    "start": "nodemon --exec node --loader ts-node/esm src/server.ts",
-    "compose": "trap 'docker-compose down' SIGINT && docker-compose up",
-    "dockerize": "docker build -t experiences-server .",
-    "container": "cross-env-shell \"docker rm -f experiences-server > /dev/null 2>&1 || true && docker run -it --rm --name experiences-server --env-file ./config.env -p 3000:3000 -v $(pwd)/src:/server/src experiences-server\""
+    "start": "nodemon --exec node --loader ts-node/esm src/server.ts"
   },
   "author": "",
   "license": "ISC",
