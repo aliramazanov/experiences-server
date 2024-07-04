@@ -1,5 +1,5 @@
 {
-  "name": "test",
+  "name": "experiences-server",
   "version": "1.0.0",
   "main": "./dist/server.js",
   "type": "module",
@@ -9,7 +9,7 @@
     "build": "npm run clean && npx tsc",
     "start": "nodemon --exec node --loader ts-node/esm src/server.ts"
   },
-  "author": "",
+  "author": "Ali Ramazanov",
   "license": "ISC",
   "description": "",
   "dependencies": {
