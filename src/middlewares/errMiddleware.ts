@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import ApplicationError from "../utils/error.js";
 
 const sendDevelopmentErrors = (error: Error | any, res: Response) => {
   res.status(error.statusCode).json({
@@ -24,6 +25,9 @@ const sendProductionErrors = (error: Error | any, res: Response) => {
   }
 };
 
+const handleJwtErrors = (_error: any) =>
+  new ApplicationError("Invalid authorization, please login again", 401);
+
 const errorController = (
   error: Error | any,
   _req: Request,
@@ -36,6 +40,11 @@ const errorController = (
   if (process.env.NODE_ENV === "development") {
     sendDevelopmentErrors(error, res);
   } else if (process.env.NODE_ENV === "production") {
+    if (
+      error.name === "JsonWebTokenError" ||
+      error.name === "TokenExpiredError"
+    )
+      error = handleJwtErrors(error);
     sendProductionErrors(error, res);
   }
 };

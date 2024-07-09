@@ -11,6 +11,8 @@ interface IUser extends Document {
   password: string;
   passConfirm: string | null;
   checkPassword(candidate: string, initial: string): Promise<boolean>;
+  passwordChangedAt?: Date;
+  changedPassAfter(JWTstamp: any): boolean;
 }
 
 const userSchema: Schema<IUser> = new Schema({
@@ -63,6 +65,7 @@ const userSchema: Schema<IUser> = new Schema({
     },
     required: [true, "Please confirm your password"],
   },
+  passwordChangedAt: Date,
 });
 
 // Hash the password with a hook and bcryptjs
@@ -88,6 +91,17 @@ userSchema.methods.checkPassword = async function (
   initial: string
 ) {
   return await bcryptjs.compare(candidate, initial);
+};
+
+userSchema.methods.changedPassAfter = function (JWTstamp: any): boolean {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(
+      String(this.passwordChangedAt.getTime() / 1000),
+      10
+    );
+    return changedTimestamp > JWTstamp;
+  }
+  return false;
 };
 
 const User: Model<IUser> = mongoose.model<IUser>("User", userSchema);

@@ -1,5 +1,5 @@
 import express from "express";
-import errorController from "./middlewares/middleware.js";
+import errorController from "./middlewares/errMiddleware.js";
 import tourRouter from "./routes/tourRouter.js";
 import authRouter from "./routes/authRouter.js";
 
