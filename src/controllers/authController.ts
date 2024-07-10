@@ -5,15 +5,15 @@ import asyncErrorWrapper from "../utils/catch.js";
 import ApplicationError from "../utils/error.js";
 import { emailRegex } from "../utils/helpers.js";
 
-class Authentication {
+class AuthController {
   private static generateToken(userId: string): string {
     return jwt.sign({ id: userId }, process.env.jwt as string, {
       expiresIn: process.env.jwtexpire as string,
     });
   }
 
-  static signup = asyncErrorWrapper(
-    async (req: Request, res: Response, next: NextFunction) => {
+  signup = asyncErrorWrapper(
+    async (req: Request, res: Response, _next: NextFunction) => {
       const { username, firstname, lastname, email, password, passConfirm } =
         req.body;
 
@@ -26,7 +26,7 @@ class Authentication {
         passConfirm,
       });
 
-      const token = Authentication.generateToken(newUser._id as string);
+      const token = AuthController.generateToken(newUser._id as string);
 
       res.status(201).json({
         headers: {
@@ -40,7 +40,7 @@ class Authentication {
     }
   );
 
-  static login = asyncErrorWrapper(
+  login = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction) => {
       const { identifier, password } = req.body;
 
@@ -71,7 +71,7 @@ class Authentication {
           );
         }
 
-        const token = Authentication.generateToken(user._id as string);
+        const token = AuthController.generateToken(user._id as string);
 
         res.status(200).json({
           headers: {
@@ -88,6 +88,39 @@ class Authentication {
       }
     }
   );
+
+  forgot = asyncErrorWrapper(
+    async (req: Request, _res: Response, next: NextFunction) => {
+      try {
+        const user = await User.findOne({ email: req.body.email });
+
+        if (!user) {
+          return next(
+            new ApplicationError(
+              "No user has been found with this email address",
+              404
+            )
+          );
+        }
+
+        const resetToken = user.createPasswordResetToken();
+        await user.save({ validateBeforeSave: false });
+      } catch (error) {
+        console.error("Password reset error:", error);
+        return next(new ApplicationError("An unexpected error occurred", 500));
+      }
+    }
+  );
+
+  reset = asyncErrorWrapper(
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+      } catch (error) {
+        console.error("Password reset error:", error);
+        return next(new ApplicationError("An unexpected error occurred", 500));
+      }
+    }
+  );
 }
 
-export default Authentication;
+export default new AuthController();

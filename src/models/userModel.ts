@@ -1,6 +1,7 @@
 import mongoose, { CallbackError, Document, Model, Schema } from "mongoose";
 import validator from "validator";
 import bcryptjs from "bcryptjs";
+import crypto from "crypto";
 
 interface IUser extends Document {
   username: string;
@@ -8,11 +9,15 @@ interface IUser extends Document {
   lastname: string;
   email: string;
   photo?: string;
+  role: string;
   password: string;
   passConfirm: string | null;
   checkPassword(candidate: string, initial: string): Promise<boolean>;
   passwordChangedAt?: Date;
   changedPassAfter(JWTstamp: any): boolean;
+  createPasswordResetToken(): string;
+  passwordResetToken: string;
+  passwordResetExpires: Date;
 }
 
 const userSchema: Schema<IUser> = new Schema({
@@ -42,6 +47,11 @@ const userSchema: Schema<IUser> = new Schema({
   photo: {
     type: String,
   },
+  role: {
+    type: String,
+    enum: ["client", "guide", "lead", "admin"],
+    default: "client",
+  },
   password: {
     type: String,
     required: [true, "Please secure your account with a password"],
@@ -66,6 +76,8 @@ const userSchema: Schema<IUser> = new Schema({
     required: [true, "Please confirm your password"],
   },
   passwordChangedAt: Date,
+  passwordResetToken: String,
+  passwordResetExpires: Date,
 });
 
 // Hash the password with a hook and bcryptjs
@@ -86,6 +98,8 @@ userSchema.pre<IUser>("save", async function (next) {
   }
 });
 
+// User schema methods
+
 userSchema.methods.checkPassword = async function (
   candidate: string,
   initial: string
@@ -102,6 +116,19 @@ userSchema.methods.changedPassAfter = function (JWTstamp: any): boolean {
     return changedTimestamp > JWTstamp;
   }
   return false;
+};
+
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString("hex");
+
+  this.passwordResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
 };
 
 const User: Model<IUser> = mongoose.model<IUser>("User", userSchema);

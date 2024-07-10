@@ -1,23 +1,30 @@
 import express from "express";
-import * as tourController from "../controllers/tourController.js";
+import TourController from "../controllers/tourController.js";
 import protect from "../middlewares/protect.js";
 
 const router = express.Router();
-router.use(protect);
 
-router.route("/tour-stats").get(tourController.getTourStats);
+router.route("/tour-stats").get(TourController.getTourStats);
 
-router.route("/monthly-plan/:year").get(tourController.getMonthlyPlan);
+router.route("/monthly-plan/:year").get(TourController.getMonthlyPlan);
 
 router
   .route("/")
-  .get(tourController.getAllTours)
-  .post(tourController.createTour);
+  .get(TourController.getAllTours)
+  .post(protect, TourController.createTour);
 
 router
   .route("/:id")
-  .get(tourController.getTour)
-  .patch(tourController.updateTour)
-  .delete(tourController.deleteTour);
+  .get(TourController.getTour)
+  .patch(
+    protect,
+    TourController.restrictRoles("admin", "lead"),
+    TourController.updateTour
+  )
+  .delete(
+    protect,
+    TourController.restrictRoles("admin"),
+    TourController.deleteTour
+  );
 
 export default router;
