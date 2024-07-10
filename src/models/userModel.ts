@@ -16,8 +16,8 @@ interface IUser extends Document {
   passwordChangedAt?: Date;
   changedPassAfter(JWTstamp: any): boolean;
   createPasswordResetToken(): string;
-  passwordResetToken: string;
-  passwordResetExpires: Date;
+  passwordResetToken: string | null;
+  passwordResetExpires: Date | null;
 }
 
 const userSchema: Schema<IUser> = new Schema({

@@ -4,6 +4,7 @@ import User from "../models/userModel.js";
 import asyncErrorWrapper from "../utils/catch.js";
 import ApplicationError from "../utils/error.js";
 import { emailRegex } from "../utils/helpers.js";
+import sendEmail from "../utils/email.js";
 
 class AuthController {
   private static generateToken(userId: string): string {
@@ -90,7 +91,7 @@ class AuthController {
   );
 
   forgot = asyncErrorWrapper(
-    async (req: Request, _res: Response, next: NextFunction) => {
+    async (req: Request, res: Response, next: NextFunction) => {
       try {
         const user = await User.findOne({ email: req.body.email });
 
@@ -105,6 +106,33 @@ class AuthController {
 
         const resetToken = user.createPasswordResetToken();
         await user.save({ validateBeforeSave: false });
+
+        const resetURL = `${req.protocol}://${req.get("host")}/api/v1/auth/reset-password/${resetToken}`;
+        const message = `Forgot your password? Please go to this link to reset it: ${resetURL}`;
+
+        try {
+          await sendEmail({
+            email: user.email,
+            subject: "Password Change Request - Valid for 10 Minutes",
+            message,
+          });
+
+          res.status(200).json({
+            status: "success",
+            message: "Token has been sent to your email address",
+          });
+        } catch (error: any) {
+          console.error(error.message);
+          user.passwordResetToken = null;
+          user.passwordResetExpires = null;
+          await user.save({ validateBeforeSave: false });
+          return next(
+            new ApplicationError(
+              "There was an error sending the email, try again later",
+              500
+            )
+          );
+        }
       } catch (error) {
         console.error("Password reset error:", error);
         return next(new ApplicationError("An unexpected error occurred", 500));
