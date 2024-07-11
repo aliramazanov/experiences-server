@@ -80,7 +80,7 @@ const userSchema: Schema<IUser> = new Schema({
   passwordResetExpires: Date,
 });
 
-// Hash the password with a hook and bcryptjs
+// MongoDB Hooks
 
 userSchema.pre<IUser>("save", async function (next) {
   if (!this.isModified("password")) {
@@ -98,7 +98,20 @@ userSchema.pre<IUser>("save", async function (next) {
   }
 });
 
-// User schema methods
+userSchema.pre<IUser>("save", async function (next) {
+  if (!this.isModified("password") || this.isNew) {
+    return next();
+  }
+
+  try {
+    this.passwordChangedAt = new Date(Date.now() - 1000);
+    next();
+  } catch (error) {
+    next(error as CallbackError);
+  }
+});
+
+// MongoDB Schema Methods
 
 userSchema.methods.checkPassword = async function (
   candidate: string,
