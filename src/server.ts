@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import app from "./app.js";
+import checkEnvVariables from "./utils/checkenv.js";
 
 dotenv.config({ path: "./config.env" });
 
@@ -8,6 +9,8 @@ const db = process.env.uri;
 const port = process.env.port || 3000;
 
 const startServer = () => {
+  checkEnvVariables();
+
   console.log("Server is starting...");
   return new Promise<void>((resolve, reject) => {
     const connectToDatabase = async () => {
