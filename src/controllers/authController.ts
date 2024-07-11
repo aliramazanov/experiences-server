@@ -1,10 +1,11 @@
+import crypto from "crypto";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
 import asyncErrorWrapper from "../utils/catch.js";
+import sendEmail from "../utils/email.js";
 import ApplicationError from "../utils/error.js";
 import { emailRegex } from "../utils/helpers.js";
-import sendEmail from "../utils/email.js";
 
 class AuthController {
   private static generateToken(userId: string): string {
@@ -143,6 +144,39 @@ class AuthController {
   reset = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction) => {
       try {
+        const hashedToken = crypto
+          .createHash("sha256")
+          .update(req.params.token)
+          .digest("hex");
+
+        const user = await User.findOne({
+          passwordResetToken: hashedToken,
+          passwordResetExpires: { $gt: Date.now() },
+        });
+
+        if (!user) {
+          return next(new ApplicationError("Token is invalid or expired", 400));
+        }
+
+        user.password = req.body.password;
+        user.passConfirm = req.body.passConfirm;
+
+        user.passwordResetToken = null;
+        user.passwordResetExpires = null;
+
+        await user.save();
+
+        const token = AuthController.generateToken(user._id as string);
+
+        res.status(200).json({
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          status: "success",
+          data: {
+            user,
+          },
+        });
       } catch (error) {
         console.error("Password reset error:", error);
         return next(new ApplicationError("An unexpected error occurred", 500));
