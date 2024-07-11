@@ -9,4 +9,5 @@ services:
       - NODE_ENV=production
     volumes:
       - ./src:/server/src
-    command: npm start
+      - ./config.env:/server/config.env
+    command: sh -c "npm run build && npm start"

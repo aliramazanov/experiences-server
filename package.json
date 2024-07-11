@@ -4,11 +4,11 @@
   "main": "./dist/server.js",
   "type": "module",
   "scripts": {
-    "debug": "ndb server.js",
     "clean": "rm -rf dist",
     "build": "npm run clean && npx tsc",
     "start": "nodemon --exec node --loader ts-node/esm src/server.ts",
-    "compose": "trap 'docker-compose down' SIGINT && docker-compose up"
+    "compose": "trap 'docker-compose down' SIGINT && docker-compose up",
+    "cleanup": "bash cleanup.sh"
   },
   "author": "Ali Ramazanov",
   "license": "ISC",
