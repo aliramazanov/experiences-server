@@ -1,5 +1,6 @@
 import express from "express";
 import AuthController from "../controllers/authController.js";
+import protect from "../middlewares/protect";
 
 const router = express.Router();
 
@@ -8,5 +9,6 @@ router.post("/login", AuthController.login);
 
 router.post("/forgot-password", AuthController.forgot);
 router.patch("/reset-password/:token", AuthController.reset);
+router.patch("/update-password/", protect, AuthController.update);
 
 export default router;

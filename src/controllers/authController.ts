@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import User from "../models/userModel.js";
+import { IUser, User } from "../models/userModel.js";
 import asyncErrorWrapper from "../utils/catch.js";
 import sendEmail from "../utils/email.js";
 import ApplicationError from "../utils/error.js";
@@ -14,10 +14,29 @@ class AuthController {
     });
   }
 
+  private static sendToken(user: IUser, statusCode: number, res: Response) {
+    const token = this.generateToken(user.id);
+    res.status(statusCode).json({
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      status: "success",
+      data: {
+        user,
+      },
+    });
+  }
+
   signup = asyncErrorWrapper(
     async (req: Request, res: Response, _next: NextFunction) => {
-      const { username, firstname, lastname, email, password, passConfirm } =
-        req.body;
+      const {
+        username,
+        firstname,
+        lastname,
+        email,
+        password,
+        confirmPassword,
+      } = req.body;
 
       const newUser = await User.create({
         username,
@@ -25,20 +44,10 @@ class AuthController {
         lastname,
         email,
         password,
-        passConfirm,
+        confirmPassword,
       });
 
-      const token = AuthController.generateToken(newUser._id as string);
-
-      res.status(201).json({
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        status: "success",
-        data: {
-          user: newUser,
-        },
-      });
+      AuthController.sendToken(newUser, 201, res);
     }
   );
 
@@ -73,17 +82,7 @@ class AuthController {
           );
         }
 
-        const token = AuthController.generateToken(user._id as string);
-
-        res.status(200).json({
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          status: "success",
-          data: {
-            user,
-          },
-        });
+        AuthController.sendToken(user, 200, res);
       } catch (error) {
         console.error("Login error:", error);
         return next(new ApplicationError("An unexpected error occurred", 500));
@@ -159,24 +158,48 @@ class AuthController {
         }
 
         user.password = req.body.password;
-        user.passConfirm = req.body.passConfirm;
+        user.confirmPassword = req.body.confirmPassword;
 
         user.passwordResetToken = null;
         user.passwordResetExpires = null;
 
         await user.save();
 
-        const token = AuthController.generateToken(user._id as string);
+        AuthController.sendToken(user, 200, res);
+      } catch (error) {
+        console.error("Password reset error:", error);
+        return next(new ApplicationError("An unexpected error occurred", 500));
+      }
+    }
+  );
 
-        res.status(200).json({
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          status: "success",
-          data: {
-            user,
-          },
-        });
+  update = asyncErrorWrapper(
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const userId = (req as any).user?.id;
+        if (!userId) {
+          return next(new ApplicationError("User not authenticated", 401));
+        }
+
+        const user = await User.findById(userId).select("password");
+        if (!user) {
+          return next(new ApplicationError("User not found", 404));
+        }
+
+        const isPasswordCorrect = await user.checkPassword(
+          req.body.password,
+          user.password
+        );
+
+        if (!isPasswordCorrect) {
+          return next(new ApplicationError("Incorrect password", 400));
+        }
+
+        user.password = req.body.newPassword;
+        user.confirmPassword = req.body.confirmPassword;
+        await user.save();
+
+        res.status(200).json({ message: "Password updated successfully" });
       } catch (error) {
         console.error("Password reset error:", error);
         return next(new ApplicationError("An unexpected error occurred", 500));

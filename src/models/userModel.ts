@@ -11,7 +11,7 @@ interface IUser extends Document {
   photo?: string;
   role: string;
   password: string;
-  passConfirm: string | null;
+  confirmPassword: string | null;
   checkPassword(candidate: string, initial: string): Promise<boolean>;
   passwordChangedAt?: Date;
   changedPassAfter(JWTstamp: any): boolean;
@@ -65,7 +65,7 @@ const userSchema: Schema<IUser> = new Schema({
     ],
     select: false,
   },
-  passConfirm: {
+  confirmPassword: {
     type: String,
     validate: {
       validator: function (this: IUser, element: any) {
@@ -91,7 +91,7 @@ userSchema.pre<IUser>("save", async function (next) {
     const salt = await bcryptjs.genSalt(12);
     const hashedPassword = await bcryptjs.hash(this.password, salt);
     this.password = hashedPassword;
-    this.passConfirm = null;
+    this.confirmPassword = null;
     next();
   } catch (error) {
     next(error as CallbackError);
@@ -146,4 +146,4 @@ userSchema.methods.createPasswordResetToken = function () {
 
 const User: Model<IUser> = mongoose.model<IUser>("User", userSchema);
 
-export default User;
+export { User, IUser };
