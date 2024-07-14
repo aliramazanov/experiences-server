@@ -1,9 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import asyncErrorWrapper from "../utils/catch";
-import User from "../models/userModel";
+import { User } from "../models/userModel";
+import ApplicationError from "../utils/error";
+import { filterObjectValues } from "../utils/helpers";
 
 class UserController {
-  static getAllUsers = asyncErrorWrapper(
+  getAllUsers = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction) => {
       const users = await User.find();
 
@@ -15,19 +17,45 @@ class UserController {
       });
     }
   );
-  static getUser = asyncErrorWrapper(
+
+  updateMyDetails = asyncErrorWrapper(
+    async (req: Request, res: Response, next: NextFunction) => {
+      if (req.body.password || req.body.confirmPassword) {
+        return next(
+          new ApplicationError("This is a wrong route or wrong parameters", 400)
+        );
+      }
+
+      const updatedFields = filterObjectValues(req.body, "name", "email");
+
+      const updatedUser = await User.findById(
+        (req as any).user.id,
+        updatedFields,
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+
+      res.status(200).json({
+        status: "success",
+        data: updatedUser,
+      });
+    }
+  );
+
+  getUser = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction) => {}
   );
-  static createUser = asyncErrorWrapper(
+  createUser = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction) => {}
   );
-  static updateUser = asyncErrorWrapper(
+  updateUser = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction) => {}
   );
-  static deleteUser = asyncErrorWrapper(
-    async (req: Request, res: Response, next: NextFunction) => {}
-  );
-  static x = asyncErrorWrapper(
+  deleteUser = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction) => {}
   );
 }
+
+export default new UserController();
