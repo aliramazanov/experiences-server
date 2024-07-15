@@ -27,7 +27,7 @@ class AuthController {
     });
   }
 
-  signup = asyncErrorWrapper(
+  public signup = asyncErrorWrapper(
     async (req: Request, res: Response, _next: NextFunction) => {
       const {
         username,
@@ -51,7 +51,7 @@ class AuthController {
     }
   );
 
-  login = asyncErrorWrapper(
+  public login = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction) => {
       const { identifier, password } = req.body;
 
@@ -74,11 +74,14 @@ class AuthController {
           return next(new ApplicationError("User not found", 404));
         }
 
-        const isValidPassword = user.checkPassword(password, user.password);
+        const isValidPassword = await user.checkPassword(
+          password,
+          user.password
+        );
 
         if (!user || !isValidPassword) {
           return next(
-            new ApplicationError("Provided identifiers are not correct", 404)
+            new ApplicationError("Provided credentials are not correct", 404)
           );
         }
 
@@ -90,7 +93,7 @@ class AuthController {
     }
   );
 
-  forgot = asyncErrorWrapper(
+  public forgot = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         const user = await User.findOne({ email: req.body.email });
@@ -140,7 +143,7 @@ class AuthController {
     }
   );
 
-  reset = asyncErrorWrapper(
+  public reset = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         const hashedToken = crypto
@@ -173,7 +176,7 @@ class AuthController {
     }
   );
 
-  update = asyncErrorWrapper(
+  public update = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         const userId = (req as any).user?.id;
@@ -201,7 +204,7 @@ class AuthController {
 
         res.status(200).json({ message: "Password updated successfully" });
       } catch (error) {
-        console.error("Password reset error:", error);
+        console.error("Password update error:", error);
         return next(new ApplicationError("An unexpected error occurred", 500));
       }
     }

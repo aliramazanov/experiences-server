@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import User from "../models/userModel.js";
+import { User } from "../models/userModel.js";
 import asyncErrorWrapper from "../utils/catch.js";
 import ApplicationError from "../utils/error.js";
 
