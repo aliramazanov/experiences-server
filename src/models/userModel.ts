@@ -18,6 +18,7 @@ interface IUser extends Document {
   createPasswordResetToken(): string;
   passwordResetToken: string | null;
   passwordResetExpires: Date | null;
+  active: boolean;
 }
 
 const userSchema: Schema<IUser> = new Schema({
@@ -78,6 +79,10 @@ const userSchema: Schema<IUser> = new Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 // MongoDB Hooks
@@ -109,6 +114,12 @@ userSchema.pre<IUser>("save", async function (next) {
   } catch (error) {
     next(error as CallbackError);
   }
+});
+
+userSchema.pre(/^find/, function (next) {
+  const query = this as mongoose.Query<any, any>;
+  query.where({ active: { $ne: false } });
+  next();
 });
 
 // MongoDB Schema Methods

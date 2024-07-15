@@ -44,6 +44,19 @@ class UserController {
     }
   );
 
+  deleteMyProfile = asyncErrorWrapper(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const updatedUser = await User.findByIdAndUpdate((req as any).user.id, {
+        active: false,
+      });
+
+      res.status(204).json({
+        status: "success",
+        data: null,
+      });
+    }
+  );
+
   getUser = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction) => {}
   );
