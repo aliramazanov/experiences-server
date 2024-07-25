@@ -1,12 +1,23 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
+import mongoose, { Document, Model, Query, Schema, Types } from "mongoose";
+import { User, IUser } from "./userModel";
 // import slugify from "slugify";
+
+interface ILocation {
+  type: string;
+  coordinates: number[];
+  address: string;
+  description: string;
+  day?: number;
+}
+
+interface IStartLocation extends Omit<ILocation, "day"> {}
 
 interface ITour extends Document {
   name: string;
   slug: string;
   duration: number;
   maxGroupSize: number;
-  difficulty: string;
+  difficulty: "easy" | "medium" | "difficult";
   ratingsAverage: number;
   ratingsQuantity: number;
   price: number;
@@ -19,6 +30,9 @@ interface ITour extends Document {
   startDates: Date[];
   secretTour: boolean;
   durationWeeks: number;
+  startLocation: IStartLocation;
+  locations: ILocation[];
+  guides: (Types.ObjectId | IUser)[];
 }
 
 const tourSchema: Schema<ITour> = new Schema(
@@ -95,6 +109,34 @@ const tourSchema: Schema<ITour> = new Schema(
       type: Boolean,
       default: false,
     },
+    startLocation: {
+      type: {
+        type: String,
+        default: "Point",
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: "Point",
+          enum: ["Point"],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+    guides: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
@@ -122,6 +164,16 @@ tourSchema.pre("find", function (next) {
   next();
 });
 
+// Query middleware to populate guides
+
+tourSchema.pre<Query<ITour, ITour>>(/^find/, function (next) {
+  this.populate({
+    path: "guides",
+    select: "-__v -passwordChangedAt",
+  });
+  next();
+});
+
 // Aggregation middleware to add match stage for secret tours
 
 tourSchema.pre("aggregate", function (next) {
@@ -131,6 +183,9 @@ tourSchema.pre("aggregate", function (next) {
   }
   next();
 });
+
+tourSchema.index({ startLocation: "2dsphere" });
+tourSchema.index({ locations: "2dsphere" });
 
 const Tour: Model<ITour> = mongoose.model<ITour>("Tour", tourSchema);
 
