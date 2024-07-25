@@ -189,4 +189,4 @@ tourSchema.index({ locations: "2dsphere" });
 
 const Tour: Model<ITour> = mongoose.model<ITour>("Tour", tourSchema);
 
-export default Tour;
+export { Tour, ITour };
