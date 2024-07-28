@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import asyncErrorWrapper from "../utils/catch";
-import { User } from "../models/userModel";
-import ApplicationError from "../utils/error";
-import { filterObjectValues } from "../utils/helpers";
+import asyncErrorWrapper from "../utils/catch.js";
+import { User } from "../models/userModel.js";
+import ApplicationError from "../utils/error.js";
+import { filterObjectValues } from "../utils/helpers.js";
 
 class UserController {
   getAllUsers = asyncErrorWrapper(

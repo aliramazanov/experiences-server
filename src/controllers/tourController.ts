@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import Tour from "../models/tourModel.js";
+import { Tour } from "../models/tourModel.js";
 import APIFeatures from "../utils/api.js";
 import ApplicationError from "../utils/error.js";
 import asyncErrorWrapper from "../utils/catch.js";
