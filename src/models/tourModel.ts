@@ -150,6 +150,14 @@ tourSchema.virtual("durationWeeks").get(function (this: ITour) {
   return this.duration / 7;
 });
 
+// Virtual property for populating
+
+tourSchema.virtual("reviews", {
+  ref: "Review",
+  foreignField: "tour",
+  localField: "_id",
+});
+
 // Document middleware: runs before .save() and .create()
 
 // tourSchema.pre<ITour>("save", function (next) {

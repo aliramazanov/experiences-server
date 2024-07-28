@@ -27,7 +27,7 @@ class TourController {
 
   getTour = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-      const tour = await Tour.findById(req.params.id);
+      const tour = await Tour.findById(req.params.id).populate("reviews");
 
       if (!tour) {
         next(new ApplicationError("No tour found", 404));

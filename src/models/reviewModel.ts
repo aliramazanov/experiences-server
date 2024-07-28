@@ -43,15 +43,10 @@ const reviewSchema: Schema<IReview> = new Schema(
 reviewSchema.pre(/^find/, function (next) {
   const query = this as mongoose.Query<any, any>;
 
-  query
-    .populate({
-      path: "tour",
-      select: "name",
-    })
-    .populate({
-      path: "user",
-      select: "name photo",
-    });
+  query.populate({
+    path: "user",
+    select: "name photo",
+  });
 
   next();
 });
