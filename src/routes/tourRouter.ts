@@ -1,6 +1,7 @@
 import express from "express";
 import TourController from "../controllers/tourController.js";
 import protect from "../middlewares/protect.js";
+import reviewRouter from "../routes/reviewRouter.js";
 
 const router = express.Router();
 
@@ -26,5 +27,7 @@ router
     TourController.restrictRoles("admin"),
     TourController.deleteTour
   );
+
+router.use("/:tour-id/reviews", reviewRouter);
 
 export default router;

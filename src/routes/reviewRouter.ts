@@ -2,7 +2,7 @@ import express from "express";
 import ReviewController from "../controllers/reviewController.js";
 import protect from "../middlewares/protect.js";
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 router
   .route("/")
