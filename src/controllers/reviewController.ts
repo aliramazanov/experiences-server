@@ -26,7 +26,7 @@ class ReviewController {
 
   createReview = asyncErrorWrapper(
     async (req: Request, res: Response, _next: NextFunction): Promise<void> => {
-      if (!req.body.experience) req.body.experience = req.params.tourId;
+      if (!req.body.experience) req.body.experience = req.params.experienceId;
       if (!req.body.user) req.body.user = (req as any).user.id;
 
       const newReview = await Review.create(req.body);

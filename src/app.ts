@@ -1,7 +1,7 @@
 import express from "express";
 import morgan from "morgan";
 import errorController from "./middlewares/errorMiddleware.js";
-import tourRouter from "./routes/tourRouter.js";
+import experienceRouter from "./routes/experienceRouter.js";
 import userRouter from "./routes/userRoutes.js";
 import reviewRouter from "./routes/reviewRouter.js";
 import authRouter from "./routes/authRouter.js";
@@ -45,7 +45,7 @@ app.use(
 );
 app.use("/api", limiter);
 
-app.use("/api/v1/tours", tourRouter);
+app.use("/api/v1/experience", experienceRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/review", reviewRouter);

@@ -1,86 +1,92 @@
 import { NextFunction, Request, Response } from "express";
-import { Tour } from "../models/tourModel.js";
+import { Experience } from "../models/experienceModel.js";
 import APIFeatures from "../utils/api.js";
 import ApplicationError from "../utils/error.js";
 import asyncErrorWrapper from "../utils/catch.js";
 
-class TourController {
-  getAllTours = asyncErrorWrapper(
+class ExperienceController {
+  getAllExperiences = asyncErrorWrapper(
     async (req: Request, res: Response): Promise<void> => {
-      const features = new APIFeatures(Tour.find(), req.query)
+      const features = new APIFeatures(Experience.find(), req.query)
         .filter()
         .sort()
         .limitFields()
         .paginate();
 
-      const tours = await features.query;
+      const experiences = await features.query;
 
       res.status(200).json({
         status: "success",
-        results: tours.length,
+        results: experiences.length,
         data: {
-          tours,
+          experiences,
         },
       });
     }
   );
 
-  getTour = asyncErrorWrapper(
+  getExperience = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-      const tour = await Tour.findById(req.params.id).populate("reviews");
+      const experience = await Experience.findById(req.params.id).populate(
+        "reviews"
+      );
 
-      if (!tour) {
-        next(new ApplicationError("No tour found", 404));
+      if (!experience) {
+        next(new ApplicationError("No experiences found", 404));
       }
 
       res.status(200).json({
         status: "success",
         data: {
-          tour,
+          experience,
         },
       });
     }
   );
 
-  createTour = asyncErrorWrapper(
+  createExperience = asyncErrorWrapper(
     async (req: Request, res: Response): Promise<void> => {
-      const newTour = await Tour.create(req.body);
+      const newExperience = await Experience.create(req.body);
 
       res.status(201).json({
         status: "success",
         data: {
-          tour: newTour,
+          experience: newExperience,
         },
       });
     }
   );
 
-  updateTour = asyncErrorWrapper(
+  updateExperience = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-      const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-        runValidators: true,
-      });
+      const experience = await Experience.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
 
-      if (!tour) {
-        return next(new ApplicationError("No tour found", 404));
+      if (!experience) {
+        return next(new ApplicationError("No experience found", 404));
       }
 
       res.status(200).json({
         status: "success",
         data: {
-          tour,
+          experience,
         },
       });
     }
   );
 
-  deleteTour = asyncErrorWrapper(
+  deleteExperience = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-      const tour = await Tour.findByIdAndDelete(req.params.id);
+      const experience = await Experience.findByIdAndDelete(req.params.id);
 
-      if (!tour) {
-        return next(new ApplicationError("No tour found", 404));
+      if (!experience) {
+        return next(new ApplicationError("No experience found", 404));
       }
 
       res.status(204).json({
@@ -90,16 +96,16 @@ class TourController {
     }
   );
 
-  getTourStats = asyncErrorWrapper(
+  getExperienceStats = asyncErrorWrapper(
     async (_req: Request, res: Response): Promise<void> => {
-      const stats = await Tour.aggregate([
+      const stats = await Experience.aggregate([
         {
           $match: { ratingsAverage: { $gte: 4.5 } },
         },
         {
           $group: {
             _id: { $toUpper: "$difficulty" },
-            numTours: { $sum: 1 },
+            numExperiences: { $sum: 1 },
             numRatings: { $sum: "$ratingsQuantity" },
             avgRating: { $avg: "$ratingsAverage" },
             avgPrice: { $avg: "$price" },
@@ -125,7 +131,7 @@ class TourController {
     async (req: Request, res: Response): Promise<void> => {
       const year = Number.parseInt(req.params.year, 10) * 1;
 
-      const plan = await Tour.aggregate([
+      const plan = await Experience.aggregate([
         {
           $unwind: "$startDates",
         },
@@ -140,8 +146,8 @@ class TourController {
         {
           $group: {
             _id: { $month: "$startDates" },
-            numTourStarts: { $sum: 1 },
-            tours: { $push: "$name" },
+            numExperienceStarts: { $sum: 1 },
+            experiences: { $push: "$name" },
           },
         },
         {
@@ -153,7 +159,7 @@ class TourController {
           },
         },
         {
-          $sort: { numTourStarts: -1 },
+          $sort: { numExperienceStarts: -1 },
         },
         {
           $limit: 12,
@@ -184,4 +190,4 @@ class TourController {
   };
 }
 
-export default new TourController();
+export default new ExperienceController();

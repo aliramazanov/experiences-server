@@ -4,7 +4,7 @@ interface IReview extends Document {
   review: string;
   rating?: number;
   createdAt: Date;
-  tour: Types.ObjectId;
+  experience: Types.ObjectId;
   user: Types.ObjectId;
 }
 
@@ -23,10 +23,10 @@ const reviewSchema: Schema<IReview> = new Schema(
       type: Date,
       default: Date.now,
     },
-    tour: {
+    experience: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Tour",
-      required: [true, "Review must belong to a tour you have booked"],
+      ref: "Experience",
+      required: [true, "Review must belong to an experience you have booked"],
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,

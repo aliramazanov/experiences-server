@@ -12,7 +12,7 @@ interface ILocation {
 
 interface IStartLocation extends Omit<ILocation, "day"> {}
 
-interface ITour extends Document {
+interface IExperience extends Document {
   name: string;
   slug: string;
   duration: number;
@@ -28,35 +28,41 @@ interface ITour extends Document {
   images: string[];
   createdAt: Date;
   startDates: Date[];
-  secretTour: boolean;
+  secretExperience: boolean;
   durationWeeks: number;
   startLocation: IStartLocation;
   locations: ILocation[];
   guides: (Types.ObjectId | IUser)[];
 }
 
-const tourSchema: Schema<ITour> = new Schema(
+const experienceSchema: Schema<IExperience> = new Schema(
   {
     name: {
       type: String,
-      required: [true, "A tour must have a name"],
+      required: [true, "An experience must have a name"],
       unique: true,
       trim: true,
-      maxlength: [40, "A tour name must have less or equal then 40 characters"],
-      minlength: [10, "A tour name must have more or equal then 10 characters"],
+      maxlength: [
+        40,
+        "An experience name must have less or equal then 40 characters",
+      ],
+      minlength: [
+        10,
+        "An experience name must have more or equal then 10 characters",
+      ],
     },
     slug: String,
     duration: {
       type: Number,
-      required: [true, "A tour must have a duration"],
+      required: [true, "An experience must have a duration"],
     },
     maxGroupSize: {
       type: Number,
-      required: [true, "A tour must have a group size"],
+      required: [true, "An experience must have a group size"],
     },
     difficulty: {
       type: String,
-      required: [true, "A tour must have a difficulty"],
+      required: [true, "An experience must have a difficulty"],
       enum: {
         values: ["easy", "medium", "difficult"],
         message: "Difficulty is either: easy, medium, difficult",
@@ -74,12 +80,12 @@ const tourSchema: Schema<ITour> = new Schema(
     },
     price: {
       type: Number,
-      required: [true, "A tour must have a price"],
+      required: [true, "An experience must have a price"],
     },
     priceDiscount: {
       type: Number,
       validate: {
-        validator: function (this: ITour, val: number) {
+        validator: function (this: IExperience, val: number) {
           return typeof val === "undefined" || val < this.price;
         },
         message: "Discount price ({VALUE}) should be below regular price",
@@ -88,7 +94,7 @@ const tourSchema: Schema<ITour> = new Schema(
     summary: {
       type: String,
       trim: true,
-      required: [true, "A tour must have a description"],
+      required: [true, "An experience must have a description"],
     },
     description: {
       type: String,
@@ -96,7 +102,7 @@ const tourSchema: Schema<ITour> = new Schema(
     },
     imageCover: {
       type: String,
-      required: [true, "A tour must have a cover image"],
+      required: [true, "An experience must have a cover image"],
     },
     images: [String],
     createdAt: {
@@ -105,7 +111,7 @@ const tourSchema: Schema<ITour> = new Schema(
       select: false,
     },
     startDates: [Date],
-    secretTour: {
+    secretExperience: {
       type: Boolean,
       default: false,
     },
@@ -146,35 +152,35 @@ const tourSchema: Schema<ITour> = new Schema(
 
 // Virtual property for duration in weeks
 
-tourSchema.virtual("durationWeeks").get(function (this: ITour) {
+experienceSchema.virtual("durationWeeks").get(function (this: IExperience) {
   return this.duration / 7;
 });
 
 // Virtual property for populating
 
-tourSchema.virtual("reviews", {
+experienceSchema.virtual("reviews", {
   ref: "Review",
-  foreignField: "tour",
+  foreignField: "experience",
   localField: "_id",
 });
 
 // Document middleware: runs before .save() and .create()
 
-// tourSchema.pre<ITour>("save", function (next) {
+// experienceSchema.pre<IExperience>("save", function (next) {
 //   this.slug = slugify(this.name, { lower: true });
 //   next();
 // });
 
-// Query middleware to filter out secret tours
+// Query middleware to filter out secret experiences
 
-tourSchema.pre("find", function (next) {
-  this.where({ secretTour: { $ne: true } });
+experienceSchema.pre("find", function (next) {
+  this.where({ secreExperience: { $ne: true } });
   next();
 });
 
 // Query middleware to populate guides
 
-tourSchema.pre<Query<ITour, ITour>>(/^find/, function (next) {
+experienceSchema.pre<Query<IExperience, IExperience>>(/^find/, function (next) {
   this.populate({
     path: "guides",
     select: "-__v -passwordChangedAt",
@@ -182,19 +188,22 @@ tourSchema.pre<Query<ITour, ITour>>(/^find/, function (next) {
   next();
 });
 
-// Aggregation middleware to add match stage for secret tours
+// Aggregation middleware to add match stage for secret experiences
 
-tourSchema.pre("aggregate", function (next) {
+experienceSchema.pre("aggregate", function (next) {
   const pipeline = this.pipeline();
   if (!pipeline.some((stage) => stage.hasOwnProperty("$match"))) {
-    pipeline.unshift({ $match: { secretTour: { $ne: true } } });
+    pipeline.unshift({ $match: { secretexperience: { $ne: true } } });
   }
   next();
 });
 
-tourSchema.index({ startLocation: "2dsphere" });
-tourSchema.index({ locations: "2dsphere" });
+experienceSchema.index({ startLocation: "2dsphere" });
+experienceSchema.index({ locations: "2dsphere" });
 
-const Tour: Model<ITour> = mongoose.model<ITour>("Tour", tourSchema);
+const Experience: Model<IExperience> = mongoose.model<IExperience>(
+  "experience",
+  experienceSchema
+);
 
-export { Tour, ITour };
+export { Experience, IExperience };
