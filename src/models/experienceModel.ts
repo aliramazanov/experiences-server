@@ -73,6 +73,7 @@ const experienceSchema: Schema<IExperience> = new Schema(
       default: 4.5,
       min: [1, "Rating must be above 1.0"],
       max: [5, "Rating must be below 5.0"],
+      set: (val: number) => Math.round(val * 10) / 10,
     },
     ratingsQuantity: {
       type: Number,
@@ -149,6 +150,8 @@ const experienceSchema: Schema<IExperience> = new Schema(
     toObject: { virtuals: true },
   }
 );
+
+experienceSchema.index({ price: 1, ratingsAverage: -1 });
 
 // Virtual property for duration in weeks
 

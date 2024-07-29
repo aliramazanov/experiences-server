@@ -64,7 +64,9 @@ class BaseService {
       .limitFields()
       .paginate();
 
-    return await features.query;
+    const document = await features.query.explain();
+
+    return document;
   }
 }
 
