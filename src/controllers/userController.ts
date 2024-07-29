@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import asyncErrorWrapper from "../utils/catch.js";
-import { User } from "../models/userModel.js";
+import { IUser, User } from "../models/userModel.js";
 import ApplicationError from "../utils/error.js";
 import { filterObjectValues } from "../utils/helpers.js";
+import FactoryFunctions from "../controllers/factoryHandler.js";
 
 class UserController {
   getAllUsers = asyncErrorWrapper(
-    async (req: Request, res: Response, next: NextFunction) => {
+    async (req: Request, res: Response, _next: NextFunction) => {
       const users = await User.find();
 
       res.status(201).json({
@@ -60,15 +61,16 @@ class UserController {
   getUser = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction) => {}
   );
+
   createUser = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction) => {}
   );
+
   updateUser = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction) => {}
   );
-  deleteUser = asyncErrorWrapper(
-    async (req: Request, res: Response, next: NextFunction) => {}
-  );
+
+  deleteUser = FactoryFunctions.deleteOne<IUser>(User);
 }
 
 export default new UserController();

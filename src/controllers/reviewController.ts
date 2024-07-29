@@ -1,18 +1,16 @@
 import { NextFunction, Request, Response } from "express";
-import Review from "../models/reviewModel.js";
-import APIFeatures from "../utils/api.js";
+import { IReview, Review } from "../models/reviewModel.js";
 import asyncErrorWrapper from "../utils/catch.js";
+import FactoryFunctions from "../controllers/factoryHandler.js";
 
 class ReviewController {
   getAllReviews = asyncErrorWrapper(
     async (req: Request, res: Response): Promise<void> => {
-      const features = new APIFeatures(Review.find(), req.query)
-        .filter()
-        .sort()
-        .limitFields()
-        .paginate();
+      let filter: any = {};
+      if (req.params.experienceId)
+        filter = { experience: req.params.experienceId };
 
-      const reviews = await features.query;
+      const reviews = await Review.find(filter);
 
       res.status(200).json({
         status: "success",
@@ -39,6 +37,8 @@ class ReviewController {
       });
     }
   );
+
+  deleteReview = FactoryFunctions.deleteOne<IReview>(Review);
 }
 
 export default new ReviewController();

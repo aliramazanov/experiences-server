@@ -9,4 +9,6 @@ router
   .get(protect, ReviewController.getAllReviews)
   .post(protect, ReviewController.createReview);
 
+router.route("/:id").delete(ReviewController.deleteReview);
+
 export default router;

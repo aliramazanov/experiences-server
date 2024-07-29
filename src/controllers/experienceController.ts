@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import { Experience } from "../models/experienceModel.js";
+import { Experience, IExperience } from "../models/experienceModel.js";
 import APIFeatures from "../utils/api.js";
 import ApplicationError from "../utils/error.js";
 import asyncErrorWrapper from "../utils/catch.js";
+import FactoryFunctions from "../controllers/factoryHandler.js";
 
 class ExperienceController {
   getAllExperiences = asyncErrorWrapper(
@@ -81,20 +82,7 @@ class ExperienceController {
     }
   );
 
-  deleteExperience = asyncErrorWrapper(
-    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-      const experience = await Experience.findByIdAndDelete(req.params.id);
-
-      if (!experience) {
-        return next(new ApplicationError("No experience found", 404));
-      }
-
-      res.status(204).json({
-        status: "success",
-        data: null,
-      });
-    }
-  );
+  deleteExperience = FactoryFunctions.deleteOne<IExperience>(Experience);
 
   getExperienceStats = asyncErrorWrapper(
     async (_req: Request, res: Response): Promise<void> => {
