@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import asyncErrorWrapper from "../utils/catch.js";
+import BaseController from "../controllers/baseController.js";
 import { IUser, User } from "../models/userModel.js";
+import asyncErrorWrapper from "../utils/catch.js";
 import ApplicationError from "../utils/error.js";
 import { filterObjectValues } from "../utils/helpers.js";
-import FactoryHandler from "../controllers/factoryHandler.js";
 
 class UserController {
   public getAllUsers = asyncErrorWrapper(
@@ -58,15 +58,13 @@ class UserController {
     }
   );
 
-  public getUser = asyncErrorWrapper(
-    async (req: Request, res: Response, next: NextFunction) => {}
-  );
+  public getUser = BaseController.getOne<IUser>(User);
 
-  public createUser = FactoryHandler.createOne<IUser>(User);
+  public createUser = BaseController.createOne<IUser>(User);
 
-  public updateUser = FactoryHandler.updateOne<IUser>(User);
+  public updateUser = BaseController.updateOne<IUser>(User);
 
-  public deleteUser = FactoryHandler.deleteOne<IUser>(User);
+  public deleteUser = BaseController.deleteOne<IUser>(User);
 }
 
 export default new UserController();

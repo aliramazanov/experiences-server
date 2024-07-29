@@ -1,6 +1,6 @@
-import { Query } from 'mongoose';
+import { Query } from "mongoose";
 
-class APIFeatures {
+class QueryBuilder {
   query: Query<any[], any>;
   queryString: any;
 
@@ -11,7 +11,7 @@ class APIFeatures {
 
   filter(): this {
     const queryObj = { ...this.queryString };
-    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+    const excludedFields = ["page", "sort", "limit", "fields"];
     excludedFields.forEach((el) => delete queryObj[el]);
 
     let queryStr = JSON.stringify(queryObj);
@@ -24,10 +24,10 @@ class APIFeatures {
 
   sort(): this {
     if (this.queryString.sort) {
-      const sortBy = this.queryString.sort.split(',').join(' ');
+      const sortBy = this.queryString.sort.split(",").join(" ");
       this.query = this.query.sort(sortBy);
     } else {
-      this.query = this.query.sort('-createdAt');
+      this.query = this.query.sort("-createdAt");
     }
 
     return this;
@@ -35,10 +35,10 @@ class APIFeatures {
 
   limitFields(): this {
     if (this.queryString.fields) {
-      const fields = this.queryString.fields.split(',').join(' ');
+      const fields = this.queryString.fields.split(",").join(" ");
       this.query = this.query.select(fields);
     } else {
-      this.query = this.query.select('-__v');
+      this.query = this.query.select("-__v");
     }
 
     return this;
@@ -55,4 +55,4 @@ class APIFeatures {
   }
 }
 
-export default APIFeatures;
+export default QueryBuilder;

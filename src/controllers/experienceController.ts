@@ -1,55 +1,20 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
+import BaseController from "../controllers/baseController.js";
 import { Experience, IExperience } from "../models/experienceModel.js";
-import APIFeatures from "../utils/api.js";
-import ApplicationError from "../utils/error.js";
 import asyncErrorWrapper from "../utils/catch.js";
-import FactoryHandler from "../controllers/factoryHandler.js";
 
 class ExperienceController {
-  public getAllExperiences = asyncErrorWrapper(
-    async (req: Request, res: Response): Promise<void> => {
-      const features = new APIFeatures(Experience.find(), req.query)
-        .filter()
-        .sort()
-        .limitFields()
-        .paginate();
+  public getAllExperiences = BaseController.getAll<IExperience>(Experience);
 
-      const experiences = await features.query;
+  public getExperience = BaseController.getOne<IExperience>(Experience, {
+    path: "reviews",
+  });
 
-      res.status(200).json({
-        status: "success",
-        results: experiences.length,
-        data: {
-          experiences,
-        },
-      });
-    }
-  );
+  public createExperience = BaseController.createOne<IExperience>(Experience);
 
-  public getExperience = asyncErrorWrapper(
-    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-      const experience = await Experience.findById(req.params.id).populate(
-        "reviews"
-      );
+  public updateExperience = BaseController.updateOne<IExperience>(Experience);
 
-      if (!experience) {
-        next(new ApplicationError("No experiences found", 404));
-      }
-
-      res.status(200).json({
-        status: "success",
-        data: {
-          experience,
-        },
-      });
-    }
-  );
-
-  public createExperience = FactoryHandler.createOne<IExperience>(Experience);
-
-  public updateExperience = FactoryHandler.updateOne<IExperience>(Experience);
-
-  public deleteExperience = FactoryHandler.deleteOne<IExperience>(Experience);
+  public deleteExperience = BaseController.deleteOne<IExperience>(Experience);
 
   public getExperienceStats = asyncErrorWrapper(
     async (_req: Request, res: Response): Promise<void> => {
@@ -129,20 +94,6 @@ class ExperienceController {
       });
     }
   );
-
-  public restrictRoles = (...roles: string[]) => {
-    return (req: Request, _res: Response, next: NextFunction) => {
-      if (!roles.includes((req as any).user.role)) {
-        return next(
-          new ApplicationError(
-            "Unauthorized action. You don't have enough permission",
-            403
-          )
-        );
-      }
-      next();
-    };
-  };
 }
 
 export default new ExperienceController();

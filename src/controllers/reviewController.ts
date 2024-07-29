@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
+import BaseController from "../controllers/baseController.js";
 import { IReview, Review } from "../models/reviewModel.js";
 import asyncErrorWrapper from "../utils/catch.js";
-import FactoryHandler from "../controllers/factoryHandler.js";
 
 class ReviewController {
   public setIds = (req: Request, _res: Response, next: NextFunction) => {
@@ -29,11 +29,13 @@ class ReviewController {
     }
   );
 
-  public createReview = FactoryHandler.createOne<IReview>(Review);
+  public getReview = BaseController.getOne<IReview>(Review);
 
-  public updateReview = FactoryHandler.updateOne<IReview>(Review);
+  public createReview = BaseController.createOne<IReview>(Review);
 
-  public deleteReview = FactoryHandler.deleteOne<IReview>(Review);
+  public updateReview = BaseController.updateOne<IReview>(Review);
+
+  public deleteReview = BaseController.deleteOne<IReview>(Review);
 }
 
 export default new ReviewController();
