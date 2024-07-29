@@ -7,7 +7,7 @@ import { filterObjectValues } from "../utils/helpers.js";
 
 class UserController {
   public getAllUsers = asyncErrorWrapper(
-    async (req: Request, res: Response, _next: NextFunction) => {
+    async (_req: Request, res: Response, _next: NextFunction) => {
       const users = await User.find();
 
       res.status(201).json({
@@ -47,7 +47,7 @@ class UserController {
 
   public deleteMyProfile = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction) => {
-      const updatedUser = await User.findByIdAndUpdate((req as any).user.id, {
+      await User.findByIdAndUpdate((req as any).user.id, {
         active: false,
       });
 

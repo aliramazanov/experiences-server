@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { Document, Model } from "mongoose";
-import asyncErrorWrapper from "../utils/catch.js";
 import BaseService from "../services/baseService.js";
+import asyncErrorWrapper from "../utils/catch.js";
 import ApplicationError from "../utils/error.js";
 
 class BaseController {
