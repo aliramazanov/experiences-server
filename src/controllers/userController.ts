@@ -65,6 +65,15 @@ class UserController {
   public updateUser = BaseController.updateOne<IUser>(User);
 
   public deleteUser = BaseController.deleteOne<IUser>(User);
+
+  public getMe = (req: Request, _res: Response, next: NextFunction) => {
+    if ((req as any).user && (req as any).user.id) {
+      req.query.id = (req as any).user.id;
+    } else {
+      return next(new Error("User not authenticated"));
+    }
+    next();
+  };
 }
 
 export default new UserController();
