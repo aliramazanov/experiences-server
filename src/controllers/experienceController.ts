@@ -1,7 +1,8 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import BaseController from "../controllers/baseController.js";
 import { Experience, IExperience } from "../models/experienceModel.js";
 import asyncErrorWrapper from "../utils/catch.js";
+import ApplicationError from "../utils/error.js";
 
 class ExperienceController {
   public getAllExperiences = BaseController.getAll<IExperience>(Experience);
@@ -94,6 +95,20 @@ class ExperienceController {
       });
     }
   );
+
+  public restrictRoles = (...roles: string[]) => {
+    return (req: Request, _res: Response, next: NextFunction) => {
+      if (!roles.includes((req as any).user.role)) {
+        return next(
+          new ApplicationError(
+            "Unauthorized action. You don't have enough permission",
+            403
+          )
+        );
+      }
+      next();
+    };
+  };
 }
 
 export default new ExperienceController();
