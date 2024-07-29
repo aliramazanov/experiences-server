@@ -1,10 +1,17 @@
 import { NextFunction, Request, Response } from "express";
 import { IReview, Review } from "../models/reviewModel.js";
 import asyncErrorWrapper from "../utils/catch.js";
-import FactoryFunctions from "../controllers/factoryHandler.js";
+import FactoryHandler from "../controllers/factoryHandler.js";
 
 class ReviewController {
-  getAllReviews = asyncErrorWrapper(
+  public setIds = (req: Request, _res: Response, next: NextFunction) => {
+    if (!req.body.experience) req.body.experience = req.params.experienceId;
+    if (!req.body.user) req.body.user = (req as any).user.id;
+
+    next();
+  };
+
+  public getAllReviews = asyncErrorWrapper(
     async (req: Request, res: Response): Promise<void> => {
       let filter: any = {};
       if (req.params.experienceId)
@@ -22,23 +29,11 @@ class ReviewController {
     }
   );
 
-  createReview = asyncErrorWrapper(
-    async (req: Request, res: Response, _next: NextFunction): Promise<void> => {
-      if (!req.body.experience) req.body.experience = req.params.experienceId;
-      if (!req.body.user) req.body.user = (req as any).user.id;
+  public createReview = FactoryHandler.createOne<IReview>(Review);
 
-      const newReview = await Review.create(req.body);
+  public updateReview = FactoryHandler.updateOne<IReview>(Review);
 
-      res.status(201).json({
-        status: "success",
-        data: {
-          newReview,
-        },
-      });
-    }
-  );
-
-  deleteReview = FactoryFunctions.deleteOne<IReview>(Review);
+  public deleteReview = FactoryHandler.deleteOne<IReview>(Review);
 }
 
 export default new ReviewController();

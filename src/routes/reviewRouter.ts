@@ -7,8 +7,11 @@ const router = express.Router({ mergeParams: true });
 router
   .route("/")
   .get(protect, ReviewController.getAllReviews)
-  .post(protect, ReviewController.createReview);
+  .post(protect, ReviewController.setIds, ReviewController.createReview);
 
-router.route("/:id").delete(ReviewController.deleteReview);
+router
+  .route("/:id")
+  .patch(ReviewController.updateReview)
+  .delete(ReviewController.deleteReview);
 
 export default router;

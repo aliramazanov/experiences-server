@@ -3,10 +3,10 @@ import { Experience, IExperience } from "../models/experienceModel.js";
 import APIFeatures from "../utils/api.js";
 import ApplicationError from "../utils/error.js";
 import asyncErrorWrapper from "../utils/catch.js";
-import FactoryFunctions from "../controllers/factoryHandler.js";
+import FactoryHandler from "../controllers/factoryHandler.js";
 
 class ExperienceController {
-  getAllExperiences = asyncErrorWrapper(
+  public getAllExperiences = asyncErrorWrapper(
     async (req: Request, res: Response): Promise<void> => {
       const features = new APIFeatures(Experience.find(), req.query)
         .filter()
@@ -26,7 +26,7 @@ class ExperienceController {
     }
   );
 
-  getExperience = asyncErrorWrapper(
+  public getExperience = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       const experience = await Experience.findById(req.params.id).populate(
         "reviews"
@@ -45,46 +45,13 @@ class ExperienceController {
     }
   );
 
-  createExperience = asyncErrorWrapper(
-    async (req: Request, res: Response): Promise<void> => {
-      const newExperience = await Experience.create(req.body);
+  public createExperience = FactoryHandler.createOne<IExperience>(Experience);
 
-      res.status(201).json({
-        status: "success",
-        data: {
-          experience: newExperience,
-        },
-      });
-    }
-  );
+  public updateExperience = FactoryHandler.updateOne<IExperience>(Experience);
 
-  updateExperience = asyncErrorWrapper(
-    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-      const experience = await Experience.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        {
-          new: true,
-          runValidators: true,
-        }
-      );
+  public deleteExperience = FactoryHandler.deleteOne<IExperience>(Experience);
 
-      if (!experience) {
-        return next(new ApplicationError("No experience found", 404));
-      }
-
-      res.status(200).json({
-        status: "success",
-        data: {
-          experience,
-        },
-      });
-    }
-  );
-
-  deleteExperience = FactoryFunctions.deleteOne<IExperience>(Experience);
-
-  getExperienceStats = asyncErrorWrapper(
+  public getExperienceStats = asyncErrorWrapper(
     async (_req: Request, res: Response): Promise<void> => {
       const stats = await Experience.aggregate([
         {
@@ -115,9 +82,9 @@ class ExperienceController {
     }
   );
 
-  getMonthlyPlan = asyncErrorWrapper(
+  public getMonthlyPlan = asyncErrorWrapper(
     async (req: Request, res: Response): Promise<void> => {
-      const year = Number.parseInt(req.params.year, 10) * 1;
+      const year = Number.parseInt(req.params.year, 10);
 
       const plan = await Experience.aggregate([
         {
@@ -163,7 +130,7 @@ class ExperienceController {
     }
   );
 
-  restrictRoles = (...roles: string[]) => {
+  public restrictRoles = (...roles: string[]) => {
     return (req: Request, _res: Response, next: NextFunction) => {
       if (!roles.includes((req as any).user.role)) {
         return next(

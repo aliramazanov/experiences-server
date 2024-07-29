@@ -3,10 +3,10 @@ import asyncErrorWrapper from "../utils/catch.js";
 import { IUser, User } from "../models/userModel.js";
 import ApplicationError from "../utils/error.js";
 import { filterObjectValues } from "../utils/helpers.js";
-import FactoryFunctions from "../controllers/factoryHandler.js";
+import FactoryHandler from "../controllers/factoryHandler.js";
 
 class UserController {
-  getAllUsers = asyncErrorWrapper(
+  public getAllUsers = asyncErrorWrapper(
     async (req: Request, res: Response, _next: NextFunction) => {
       const users = await User.find();
 
@@ -19,7 +19,7 @@ class UserController {
     }
   );
 
-  updateMyDetails = asyncErrorWrapper(
+  public updateMyDetails = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction) => {
       if (req.body.password || req.body.confirmPassword) {
         return next(
@@ -45,7 +45,7 @@ class UserController {
     }
   );
 
-  deleteMyProfile = asyncErrorWrapper(
+  public deleteMyProfile = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction) => {
       const updatedUser = await User.findByIdAndUpdate((req as any).user.id, {
         active: false,
@@ -58,19 +58,15 @@ class UserController {
     }
   );
 
-  getUser = asyncErrorWrapper(
+  public getUser = asyncErrorWrapper(
     async (req: Request, res: Response, next: NextFunction) => {}
   );
 
-  createUser = asyncErrorWrapper(
-    async (req: Request, res: Response, next: NextFunction) => {}
-  );
+  public createUser = FactoryHandler.createOne<IUser>(User);
 
-  updateUser = asyncErrorWrapper(
-    async (req: Request, res: Response, next: NextFunction) => {}
-  );
+  public updateUser = FactoryHandler.updateOne<IUser>(User);
 
-  deleteUser = FactoryFunctions.deleteOne<IUser>(User);
+  public deleteUser = FactoryHandler.deleteOne<IUser>(User);
 }
 
 export default new UserController();
