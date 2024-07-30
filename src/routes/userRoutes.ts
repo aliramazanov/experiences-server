@@ -1,22 +1,16 @@
 import express from "express";
-import protect from "../middlewares/protect.js";
-import UserController from "../controllers/userController.js";
 import AuthController from "../controllers/authController.js";
-import multer from "multer";
+import UserController from "../controllers/userController.js";
+import protect from "../middlewares/protect.js";
+import { uploadUserPhoto } from "../utils/multer.js";
 
 const router = express.Router();
-
-const upload = multer({ dest: "public/img/users/" });
 
 router.use(protect);
 
 router.get("/me", UserController.getMe, UserController.getUser);
 
-router.patch(
-  "/my-profile",
-  upload.single("photo"),
-  UserController.updateMyDetails
-);
+router.patch("/my-profile", uploadUserPhoto, UserController.updateMyDetails);
 
 router.delete("/my-profile", UserController.deleteMyProfile);
 

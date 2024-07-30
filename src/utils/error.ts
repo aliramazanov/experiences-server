@@ -2,6 +2,7 @@ class ApplicationError extends Error {
   statusCode: number | string;
   status: string;
   isOperational: boolean;
+
   constructor(message: string, statusCode: string | number) {
     super(message);
     this.statusCode = statusCode;
