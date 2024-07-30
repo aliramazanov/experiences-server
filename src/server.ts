@@ -9,25 +9,31 @@ dotenv.config({ path: "./config.env" });
 const db = process.env.uri;
 const port = process.env.port || 3000;
 
+if (!db) {
+  throw new Error("Database URI not specified in environment variables.");
+}
+
 let server: http.Server;
 
-const startServer = (): Promise<void> => {
+const startServer = async (): Promise<void> => {
   checkEnvVariables();
 
   console.log("Server is starting...");
-  return new Promise<void>((resolve, reject) => {
-    const connectToDatabase = async (): Promise<void> => {
-      try {
-        await mongoose.connect(db as string);
-        console.log("Database connection established");
-        resolve();
-      } catch (error: any) {
-        console.error("Database connection failed: ", error.message);
-        reject(error);
-      }
-    };
+  try {
+    await mongoose.connect(db as string);
+    console.log("Database connection established");
+  } catch (error: any) {
+    console.error("Database connection failed: ", error.message);
+    throw error;
+  }
+};
 
-    connectToDatabase();
+const closeConnections = (): Promise<void> => {
+  return new Promise((resolve) => {
+    mongoose.connection.close().finally(() => {
+      console.log("MongoDB connection closed.");
+      resolve();
+    });
   });
 };
 
@@ -36,16 +42,10 @@ const gracefulShutdown = (signal: string) => {
   if (server) {
     server.close(() => {
       console.log("HTTP server closed.");
-      mongoose.connection.close().finally(() => {
-        console.log("MongoDB connection closed.");
-        process.exit(0);
-      });
+      closeConnections().finally(() => process.exit(0));
     });
   } else {
-    mongoose.connection.close().finally(() => {
-      console.log("MongoDB connection closed.");
-      process.exit(0);
-    });
+    closeConnections().finally(() => process.exit(0));
   }
 };
 
@@ -56,13 +56,13 @@ startServer()
     });
 
     process.on("unhandledRejection", (error: any) => {
-      console.error("Unhandled Rejection:", error.message);
+      console.error("Unhandled Rejection:", error.stack || error.message);
       if (server) {
         server.close(() => {
-          mongoose.connection.close().finally(() => process.exit(1));
+          closeConnections().finally(() => process.exit(1));
         });
       } else {
-        mongoose.connection.close().finally(() => process.exit(1));
+        closeConnections().finally(() => process.exit(1));
       }
     });
 
