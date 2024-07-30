@@ -14,3 +14,15 @@ export const filterObjectValues = (
 
   return newObject;
 };
+
+const kmToRad = 6378.1;
+const milesToRad = 3763.2;
+
+export function convertDistanceToRadius(
+  distance: number | string,
+  unit: "km" | "miles"
+): number {
+  const distanceNumber =
+    typeof distance === "number" ? distance : Number(distance);
+  return unit === "km" ? distanceNumber / kmToRad : distanceNumber / milesToRad;
+}

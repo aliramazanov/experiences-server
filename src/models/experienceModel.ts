@@ -1,5 +1,5 @@
 import mongoose, { Document, Model, Query, Schema, Types } from "mongoose";
-import { IUser } from "./userModel";
+import { IUser } from "../models/userModel.js";
 // import slugify from "slugify";
 
 interface ILocation {
@@ -176,10 +176,10 @@ experienceSchema.virtual("reviews", {
 
 // Query middleware to filter out secret experiences
 
-experienceSchema.pre("find", function (next) {
-  this.where({ secreExperience: { $ne: true } });
-  next();
-});
+// experienceSchema.pre("find", function (next) {
+//   this.where({ secreExperience: { $ne: true } });
+//   next();
+// });
 
 // Query middleware to populate guides
 

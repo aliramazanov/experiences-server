@@ -14,7 +14,7 @@ interface IUser extends Document {
   confirmPassword: string | null;
   checkPassword(candidate: string, initial: string): Promise<boolean>;
   passwordChangedAt?: Date;
-  changedPassAfter(JWTstamp: any): boolean;
+  changedPasswordAfter(JWTstamp: any): boolean;
   createPasswordResetToken(): string;
   passwordResetToken: string | null;
   passwordResetExpires: Date | null;
@@ -131,7 +131,7 @@ userSchema.methods.checkPassword = async function (
   return await bcryptjs.compare(candidate, initial);
 };
 
-userSchema.methods.changedPassAfter = function (JWTstamp: any): boolean {
+userSchema.methods.changedPasswordAfter = function (JWTstamp: any): boolean {
   if (this.passwordChangedAt) {
     const changedTimestamp = parseInt(
       String(this.passwordChangedAt.getTime() / 1000),

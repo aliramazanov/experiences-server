@@ -9,6 +9,16 @@ router.use(protect);
 
 router.route("/experience-stats").get(ExperienceController.getExperienceStats);
 
+router.get(
+  "/experiences-in/:distance/center/:latlong/unit/:value",
+  ExperienceController.getExperiencesWithinRadius
+);
+
+router.get(
+  "/distances/:latlong/unit/:value",
+  ExperienceController.getDistancesOfExperiences
+);
+
 router
   .route("/monthly-plan/:year")
   .get(

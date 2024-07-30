@@ -3,6 +3,7 @@ import BaseController from "../controllers/baseController.js";
 import { Experience, IExperience } from "../models/experienceModel.js";
 import asyncErrorWrapper from "../utils/catch.js";
 import ApplicationError from "../utils/error.js";
+import { convertDistanceToRadius } from "../utils/helpers.js";
 
 class ExperienceController {
   public getAllExperiences = BaseController.getAll<IExperience>(Experience);
@@ -91,6 +92,77 @@ class ExperienceController {
         status: "success",
         data: {
           plan,
+        },
+      });
+    }
+  );
+
+  public getExperiencesWithinRadius = asyncErrorWrapper(
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      const { distance, latlong, unit } = req.params;
+      const [lat, long] = latlong.split(",");
+
+      if (!lat || !long) {
+        return next(
+          new ApplicationError(
+            "Please provide latitude and longitude correctly",
+            400
+          )
+        );
+      }
+
+      const radius = convertDistanceToRadius(distance, unit as "km" | "miles");
+
+      const experiences = await Experience.find({
+        startLocation: {
+          $geoWithin: {
+            $centerSphere: [[parseFloat(long), parseFloat(lat)], radius],
+          },
+        },
+      });
+
+      res.status(200).json({
+        status: "success",
+        results: experiences.length,
+        data: {
+          experiences,
+        },
+      });
+    }
+  );
+
+  getDistancesOfExperiences = asyncErrorWrapper(
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      const { latlong, unit } = req.params;
+      const [lat, long] = latlong.split(",");
+
+      if (!lat || !long) {
+        return next(
+          new ApplicationError(
+            "Please provide latitude and longitude correctly",
+            400
+          )
+        );
+      }
+
+      const distances = await Experience.aggregate([
+        {
+          $geoNear: {
+            near: {
+              type: "Point",
+              coordinates: [parseFloat(long), parseFloat(lat)],
+            },
+            distanceField: "distance",
+            spherical: true,
+            distanceMultiplier: unit === "km" ? 0.001 : 0.000621371,
+          },
+        },
+      ]);
+
+      res.status(200).json({
+        status: "success",
+        data: {
+          distances,
         },
       });
     }

@@ -5,7 +5,7 @@ import asyncErrorWrapper from "../utils/catch.js";
 import ApplicationError from "../utils/error.js";
 
 const protect = asyncErrorWrapper(
-  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  async (req: Request, _res: Response, next: NextFunction): Promise<any> => {
     let token;
 
     if (
@@ -47,7 +47,7 @@ const protect = asyncErrorWrapper(
         );
       }
 
-      if (latestUser.changedPassAfter(decoded.iat)) {
+      if (latestUser.changedPasswordAfter(decoded.iat)) {
         return next(
           new ApplicationError(
             "Your password has recently been changed. Please login again",
