@@ -2,22 +2,17 @@ import multer, { StorageEngine, FileFilterCallback } from "multer";
 import { Request } from "express";
 import ApplicationError from "./error";
 
-interface MulterFile extends Express.Multer.File {
-  originalname: string;
-  mimetype: string;
-}
-
 const multerStorage: StorageEngine = multer.diskStorage({
   destination: (
     _req: Request,
-    _file: MulterFile,
+    _file: Express.Multer.File,
     cb: (error: Error | null, destination: string) => void
   ) => {
     cb(null, "public/images/users");
   },
   filename: (
     req: Request,
-    file: MulterFile,
+    file: Express.Multer.File,
     cb: (error: Error | null, filename: string) => void
   ) => {
     const ext = file.mimetype.split("/")[1];
@@ -28,9 +23,13 @@ const multerStorage: StorageEngine = multer.diskStorage({
 
 const multerFilter: (
   req: Request,
-  file: MulterFile,
+  file: Express.Multer.File,
   cb: FileFilterCallback
-) => void = (_req: Request, file: MulterFile, cb: FileFilterCallback) => {
+) => void = (
+  _req: Request,
+  file: Express.Multer.File,
+  cb: FileFilterCallback
+) => {
   if (file.mimetype.startsWith("image")) {
     cb(null, true);
   } else {
@@ -45,10 +44,11 @@ const multerFilter: (
 const upload = multer({
   storage: multerStorage,
   fileFilter: multerFilter,
+  limits: { fileSize: 2048 * 2048 * 5 },
 });
 
 export const uploadUserPhoto = upload.single("photo");
 
 export interface MulterRequest extends Request {
-  file?: MulterFile;
+  file?: Express.Multer.File;
 }
