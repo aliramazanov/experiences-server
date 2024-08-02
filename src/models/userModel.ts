@@ -47,6 +47,7 @@ const userSchema: Schema<IUser> = new Schema({
   },
   photo: {
     type: String,
+    default: "profile-photo.jpg",
   },
   role: {
     type: String,

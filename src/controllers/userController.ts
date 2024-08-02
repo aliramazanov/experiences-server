@@ -29,6 +29,10 @@ class UserController {
 
       const updatedFields = filterObjectValues(req.body, "name", "email");
 
+      if (req.file) {
+        updatedFields.photo = req.file.filename;
+      }
+
       const updatedUser = await User.findById(
         (req as any).user.id,
         updatedFields,

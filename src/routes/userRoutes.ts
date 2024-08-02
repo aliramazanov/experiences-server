@@ -2,7 +2,7 @@ import express from "express";
 import AuthController from "../controllers/authController.js";
 import UserController from "../controllers/userController.js";
 import protect from "../middlewares/protect.js";
-import { uploadUserPhoto } from "../utils/multer.js";
+import { resizeProfilePhoto, uploadUserPhoto } from "../utils/image.js";
 
 const router = express.Router();
 
@@ -10,7 +10,12 @@ router.use(protect);
 
 router.get("/me", UserController.getMe, UserController.getUser);
 
-router.patch("/my-profile", uploadUserPhoto, UserController.updateMyDetails);
+router.patch(
+  "/my-profile",
+  uploadUserPhoto,
+  resizeProfilePhoto,
+  UserController.updateMyDetails
+);
 
 router.delete("/my-profile", UserController.deleteMyProfile);
 

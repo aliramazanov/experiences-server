@@ -8,6 +8,7 @@ import authRouter from "./routes/authRouter.js";
 import helmet from "helmet";
 import hpp from "hpp";
 import { parse } from "secure-json-parse";
+import cors from "cors";
 
 import ApplicationError from "./utils/error.js";
 import limiter from "./middlewares/rateLimiter.js";
@@ -29,6 +30,7 @@ app.use(
   })
 );
 
+app.use(cors({ origin: "*" }));
 app.use(morgan("dev"));
 app.use(helmet());
 app.use(
