@@ -1,12 +1,13 @@
 import nodemailer from "nodemailer";
+import { EmailUser } from "../@types/email-service";
 
-class Email {
+class EmailService {
   private to: string;
   private firstName: string;
   private url: string;
   private from: string;
 
-  constructor(user: { email: string; name: string }, url: string) {
+  constructor(user: EmailUser, url: string) {
     this.to = user.email;
     this.firstName = user.name.split(" ")[0];
     this.url = url;
@@ -15,11 +16,11 @@ class Email {
 
   private createTransport() {
     return nodemailer.createTransport({
-      host: process.env.EMAIL_HOST as string,
-      port: Number(process.env.EMAIL_PORT),
+      host: process.env.emailhost as string,
+      port: Number(process.env.emailport),
       auth: {
-        user: process.env.EMAIL_USERNAME as string,
-        pass: process.env.EMAIL_PASSWORD as string,
+        user: process.env.emailusername as string,
+        pass: process.env.emailpassword as string,
       },
     });
   }
@@ -43,7 +44,7 @@ class Email {
     );
   }
 
-  async sendPasswordReset() {
+  public async sendPasswordReset() {
     await this.send(
       `We received a request to reset your password. Please visit this link to reset your password: ${this.url}`,
       "Your password reset token (valid for 10 minutes)"
@@ -51,4 +52,4 @@ class Email {
   }
 }
 
-export default Email;
+export default EmailService;

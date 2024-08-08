@@ -1,5 +1,5 @@
 import mongoose, { Document, Model, Query, Schema, Types } from "mongoose";
-import { IUser } from "../models/userModel.js";
+import { IUser } from "./user.model.js";
 // import slugify from "slugify";
 
 interface ILocation {

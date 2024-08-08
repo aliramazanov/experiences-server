@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import ApplicationError from "../utils/error.js";
+import ApplicationError from "../utils/application-errors-handler.js";
 
 const sendDevelopmentErrors = (error: Error | any, res: Response) => {
   res.status(error.statusCode).json({

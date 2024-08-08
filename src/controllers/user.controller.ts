@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import BaseController from "../controllers/baseController.js";
-import { IUser, User } from "../models/userModel.js";
-import asyncErrorWrapper from "../utils/catch.js";
-import ApplicationError from "../utils/error.js";
-import { filterObjectValues } from "../utils/helpers.js";
+import BaseController from "./base.controller.js";
+import { IUser, User } from "../models/user.model.js";
+import asyncErrorWrapper from "../utils/async-error-wrapper.js";
+import ApplicationError from "../utils/application-errors-handler.js";
+import { filterObjectValues } from "../utils/general-helpers.js";
 
 class UserController {
   public getAllUsers = asyncErrorWrapper(

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import BaseController from "../controllers/baseController.js";
+import BaseController from "./base.controller.js";
 import { IReview, Review } from "../models/reviewModel.js";
 
 class ReviewController {

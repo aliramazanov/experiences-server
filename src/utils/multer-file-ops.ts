@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import multer, { FileFilterCallback } from "multer";
 import sharp from "sharp";
-import asyncErrorWrapper from "./catch";
-import ApplicationError from "./error";
+import asyncErrorWrapper from "./async-error-wrapper";
+import ApplicationError from "./application-errors-handler";
 
 export interface MulterRequest extends Request {
   user?: any;
@@ -97,3 +97,8 @@ export const resizeExperienceImages = asyncErrorWrapper(
     }
   }
 );
+
+export const uploadExperienceImages = upload.fields([
+  { name: "cover", maxCount: 1 },
+  { name: "images", maxCount: 3 },
+]);

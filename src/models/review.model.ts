@@ -1,5 +1,5 @@
 import mongoose, { Document, Model, Query, Schema, Types } from "mongoose";
-import { Experience } from "../models/experienceModel.js";
+import { Experience } from "./experience.model.js";
 
 interface IReview extends Document {
   review: string;

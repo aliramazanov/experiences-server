@@ -1,17 +1,17 @@
 import express from "express";
 import morgan from "morgan";
-import errorController from "./middlewares/errorMiddleware.js";
-import experienceRouter from "./routes/experienceRouter.js";
-import userRouter from "./routes/userRoutes.js";
-import reviewRouter from "./routes/reviewRouter.js";
-import authRouter from "./routes/authRouter.js";
+import errorController from "./middlewares/error.middleware.js";
+import experienceRouter from "./routes/experiences.router.js";
+import userRouter from "./routes/users.router.js";
+import reviewRouter from "./routes/reviews.router.js";
+import authRouter from "./routes/authentication.router.js";
 import helmet from "helmet";
 import hpp from "hpp";
 import { parse } from "secure-json-parse";
 import cors from "cors";
 
-import ApplicationError from "./utils/error.js";
-import limiter from "./middlewares/rateLimiter.js";
+import ApplicationError from "./utils/application-errors-handler.js";
+import limiter from "./middlewares/rate-limiter.js";
 
 const app = express();
 

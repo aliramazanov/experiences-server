@@ -1,8 +1,11 @@
 import express from "express";
-import AuthController from "../controllers/authController.js";
-import UserController from "../controllers/userController.js";
-import protect from "../middlewares/protect.js";
-import { resizeProfilePhoto, uploadUserPhoto } from "../utils/multer.js";
+import AuthController from "../controllers/auth.controller.js";
+import UserController from "../controllers/user.controller.js";
+import protect from "../middlewares/protect.middleware.js";
+import {
+  resizeProfilePhoto,
+  uploadUserPhoto,
+} from "../utils/multer-file-ops.js";
 
 const router = express.Router();
 

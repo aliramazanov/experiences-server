@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import BaseController from "../controllers/baseController.js";
-import { Experience, IExperience } from "../models/experienceModel.js";
-import asyncErrorWrapper from "../utils/catch.js";
-import ApplicationError from "../utils/error.js";
-import { convertDistanceToRadius } from "../utils/helpers.js";
+import BaseController from "./base.controller.js";
+import { Experience, IExperience } from "../models/experience.model.js";
+import asyncErrorWrapper from "../utils/async-error-wrapper.js";
+import ApplicationError from "../utils/application-errors-handler.js";
+import { convertDistanceToRadius } from "../utils/general-helpers.js";
 
 class ExperienceController {
   public getAllExperiences = BaseController.getAll<IExperience>(Experience);

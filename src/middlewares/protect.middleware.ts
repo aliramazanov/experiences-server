@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { User } from "../models/userModel.js";
-import asyncErrorWrapper from "../utils/catch.js";
-import ApplicationError from "../utils/error.js";
+import { User } from "../models/user.model.js";
+import asyncErrorWrapper from "../utils/async-error-wrapper.js";
+import ApplicationError from "../utils/application-errors-handler.js";
 
 const protect = asyncErrorWrapper(
   async (req: Request, _res: Response, next: NextFunction): Promise<any> => {

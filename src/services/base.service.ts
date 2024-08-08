@@ -1,6 +1,6 @@
 import { Document, Model } from "mongoose";
-import ApplicationError from "../utils/error.js";
-import QueryBuilder from "../utils/queries.js";
+import ApplicationError from "../utils/application-errors-handler.js";
+import QueryBuilder from "../utils/query-builder.js";
 
 class BaseService {
   public async createOne<T extends Document>(Model: Model<T>, data: any) {
