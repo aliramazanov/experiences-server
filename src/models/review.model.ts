@@ -17,7 +17,7 @@ interface IReviewQuery extends Query<any, any> {
   r?: IReview;
 }
 
-const reviewSchema: Schema<IReview> = new Schema(
+const ReviewSchema: Schema<IReview> = new Schema(
   {
     review: {
       type: String,
@@ -49,10 +49,10 @@ const reviewSchema: Schema<IReview> = new Schema(
   }
 );
 
-reviewSchema.index({ experience: 1, user: 1 }, { unique: true });
+ReviewSchema.index({ experience: 1, user: 1 }, { unique: true });
 
 // Populating user names and photos on reviews
-reviewSchema.pre<Query<IReview, IReview>>(/^find/, function (next) {
+ReviewSchema.pre<Query<IReview, IReview>>(/^find/, function (next) {
   this.populate({
     path: "user",
     select: "name photo",
@@ -60,7 +60,7 @@ reviewSchema.pre<Query<IReview, IReview>>(/^find/, function (next) {
   next();
 });
 
-reviewSchema.statics.calculateAverageRating = async function (
+ReviewSchema.statics.calculateAverageRating = async function (
   experienceId: Types.ObjectId
 ) {
   const statistics = await this.aggregate([
@@ -89,7 +89,7 @@ reviewSchema.statics.calculateAverageRating = async function (
   }
 };
 
-reviewSchema.pre<IReview>("save", async function (next) {
+ReviewSchema.pre<IReview>("save", async function (next) {
   await (this.constructor as IReviewModel).calculateAverageRating(
     this.experience
   );
@@ -97,12 +97,12 @@ reviewSchema.pre<IReview>("save", async function (next) {
   next();
 });
 
-reviewSchema.pre<IReviewQuery>("findOneAndUpdate", async function (next) {
+ReviewSchema.pre<IReviewQuery>("findOneAndUpdate", async function (next) {
   this.r = await this.findOne();
   next();
 });
 
-reviewSchema.post<IReviewQuery>("findOneAndUpdate", async function () {
+ReviewSchema.post<IReviewQuery>("findOneAndUpdate", async function () {
   if (this.r) {
     await (this.r.constructor as IReviewModel).calculateAverageRating(
       this.r.experience
@@ -112,7 +112,7 @@ reviewSchema.post<IReviewQuery>("findOneAndUpdate", async function () {
 
 const Review: IReviewModel = mongoose.model<IReview, IReviewModel>(
   "Review",
-  reviewSchema
+  ReviewSchema
 );
 
 export { IReview, Review };

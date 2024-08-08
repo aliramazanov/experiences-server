@@ -35,7 +35,7 @@ interface IExperience extends Document {
   guides: (Types.ObjectId | IUser)[];
 }
 
-const experienceSchema: Schema<IExperience> = new Schema(
+const ExperienceSchema: Schema<IExperience> = new Schema(
   {
     name: {
       type: String,
@@ -151,17 +151,17 @@ const experienceSchema: Schema<IExperience> = new Schema(
   }
 );
 
-experienceSchema.index({ price: 1, ratingsAverage: -1 });
+ExperienceSchema.index({ price: 1, ratingsAverage: -1 });
 
 // Virtual property for duration in weeks
 
-experienceSchema.virtual("durationWeeks").get(function (this: IExperience) {
+ExperienceSchema.virtual("durationWeeks").get(function (this: IExperience) {
   return this.duration / 7;
 });
 
 // Virtual property for populating
 
-experienceSchema.virtual("reviews", {
+ExperienceSchema.virtual("reviews", {
   ref: "Review",
   foreignField: "experience",
   localField: "_id",
@@ -169,21 +169,21 @@ experienceSchema.virtual("reviews", {
 
 // Document middleware: runs before .save() and .create()
 
-// experienceSchema.pre<IExperience>("save", function (next) {
+// ExperienceSchema.pre<IExperience>("save", function (next) {
 //   this.slug = slugify(this.name, { lower: true });
 //   next();
 // });
 
 // Query middleware to filter out secret experiences
 
-// experienceSchema.pre("find", function (next) {
+// ExperienceSchema.pre("find", function (next) {
 //   this.where({ secreExperience: { $ne: true } });
 //   next();
 // });
 
 // Query middleware to populate guides
 
-experienceSchema.pre<Query<IExperience, IExperience>>(/^find/, function (next) {
+ExperienceSchema.pre<Query<IExperience, IExperience>>(/^find/, function (next) {
   this.populate({
     path: "guides",
     select: "-__v -passwordChangedAt",
@@ -193,7 +193,7 @@ experienceSchema.pre<Query<IExperience, IExperience>>(/^find/, function (next) {
 
 // Aggregation middleware to add match stage for secret experiences
 
-experienceSchema.pre("aggregate", function (next) {
+ExperienceSchema.pre("aggregate", function (next) {
   const pipeline = this.pipeline();
   if (!pipeline.some((stage) => stage.hasOwnProperty("$match"))) {
     pipeline.unshift({ $match: { secretexperience: { $ne: true } } });
@@ -201,12 +201,12 @@ experienceSchema.pre("aggregate", function (next) {
   next();
 });
 
-experienceSchema.index({ startLocation: "2dsphere" });
-experienceSchema.index({ locations: "2dsphere" });
+ExperienceSchema.index({ startLocation: "2dsphere" });
+ExperienceSchema.index({ locations: "2dsphere" });
 
 const Experience: Model<IExperience> = mongoose.model<IExperience>(
   "experience",
-  experienceSchema
+  ExperienceSchema
 );
 
 export { Experience, IExperience };

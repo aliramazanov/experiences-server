@@ -21,7 +21,7 @@ interface IUser extends Document {
   active: boolean;
 }
 
-const userSchema: Schema<IUser> = new Schema({
+const UserSchema: Schema<IUser> = new Schema({
   username: {
     type: String,
     required: [true, "Please pick an username"],
@@ -88,7 +88,7 @@ const userSchema: Schema<IUser> = new Schema({
 
 // MongoDB Hooks
 
-userSchema.pre<IUser>("save", async function (next) {
+UserSchema.pre<IUser>("save", async function (next) {
   if (!this.isModified("password")) {
     return next();
   }
@@ -104,7 +104,7 @@ userSchema.pre<IUser>("save", async function (next) {
   }
 });
 
-userSchema.pre<IUser>("save", async function (next) {
+UserSchema.pre<IUser>("save", async function (next) {
   if (!this.isModified("password") || this.isNew) {
     return next();
   }
@@ -117,7 +117,7 @@ userSchema.pre<IUser>("save", async function (next) {
   }
 });
 
-userSchema.pre(/^find/, function (next) {
+UserSchema.pre(/^find/, function (next) {
   const query = this as mongoose.Query<any, any>;
   query.where({ active: { $ne: false } });
   next();
@@ -125,14 +125,14 @@ userSchema.pre(/^find/, function (next) {
 
 // MongoDB Schema Methods
 
-userSchema.methods.checkPassword = async function (
+UserSchema.methods.checkPassword = async function (
   candidate: string,
   initial: string
 ) {
   return await bcryptjs.compare(candidate, initial);
 };
 
-userSchema.methods.changedPasswordAfter = function (JWTstamp: any): boolean {
+UserSchema.methods.changedPasswordAfter = function (JWTstamp: any): boolean {
   if (this.passwordChangedAt) {
     const changedTimestamp = parseInt(
       String(this.passwordChangedAt.getTime() / 1000),
@@ -143,7 +143,7 @@ userSchema.methods.changedPasswordAfter = function (JWTstamp: any): boolean {
   return false;
 };
 
-userSchema.methods.createPasswordResetToken = function () {
+UserSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString("hex");
 
   this.passwordResetToken = crypto
@@ -156,6 +156,6 @@ userSchema.methods.createPasswordResetToken = function () {
   return resetToken;
 };
 
-const User: Model<IUser> = mongoose.model<IUser>("User", userSchema);
+const User: Model<IUser> = mongoose.model<IUser>("User", UserSchema);
 
 export { User, IUser };
