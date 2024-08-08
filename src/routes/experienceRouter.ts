@@ -3,6 +3,10 @@ import ExperienceController from "../controllers/experienceController.js";
 import protect from "../middlewares/protect.js";
 import reviewRouter from "./reviewRouter.js";
 import AuthController from "../controllers/authController.js";
+import {
+  resizeExperienceImages,
+  uploadExperienceImages,
+} from "../utils/multer.js";
 
 const router = express.Router();
 router.use(protect);
@@ -39,6 +43,8 @@ router
   .get(ExperienceController.getExperience)
   .patch(
     AuthController.restrictRoles("admin", "lead"),
+    uploadExperienceImages,
+    resizeExperienceImages,
     ExperienceController.updateExperience
   )
   .delete(

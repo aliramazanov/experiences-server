@@ -2,7 +2,7 @@ import express from "express";
 import AuthController from "../controllers/authController.js";
 import UserController from "../controllers/userController.js";
 import protect from "../middlewares/protect.js";
-import { resizeProfilePhoto, uploadUserPhoto } from "../utils/image.js";
+import { resizeProfilePhoto, uploadUserPhoto } from "../utils/multer.js";
 
 const router = express.Router();
 

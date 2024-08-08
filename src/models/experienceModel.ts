@@ -24,7 +24,7 @@ interface IExperience extends Document {
   priceDiscount?: number;
   summary: string;
   description?: string;
-  imageCover: string;
+  cover: string;
   images: string[];
   createdAt: Date;
   startDates: Date[];
@@ -101,7 +101,7 @@ const experienceSchema: Schema<IExperience> = new Schema(
       type: String,
       trim: true,
     },
-    imageCover: {
+    cover: {
       type: String,
       required: [true, "An experience must have a cover image"],
     },

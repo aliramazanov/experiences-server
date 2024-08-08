@@ -54,6 +54,32 @@ export const resizeProfilePhoto = async (
 
 export const uploadUserPhoto = upload.single("photo");
 
+export const uploadExperienceImages = upload.fields([
+  { name: "cover", maxCount: 1 },
+  { name: "images", maxCount: 3 },
+]);
+
+export const resizeExperienceImages = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (!req.file) return next();
+  const userId = (req as any).user?.id || "unknown";
+  req.file.filename = `user-${userId}-${Date.now()}.jpeg`;
+
+  try {
+    await sharp(req.file.buffer)
+      .resize(700, 700)
+      .toFormat("jpeg")
+      .jpeg({ quality: 95 })
+      .toFile(`public/img/users/${req.file.filename}`);
+    next();
+  } catch (err) {
+    next(err);
+  }
+};
+
 export interface MulterRequest extends Request {
   file?: Express.Multer.File;
 }
