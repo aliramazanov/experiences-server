@@ -1,39 +1,6 @@
-import mongoose, { Document, Model, Query, Schema, Types } from "mongoose";
-import { IUser } from "./user.model.js";
+import mongoose, { Model, Query, Schema } from "mongoose";
+import { IExperience } from "../@types/experience-schema.js";
 // import slugify from "slugify";
-
-interface ILocation {
-  type: string;
-  coordinates: number[];
-  address: string;
-  description: string;
-  day?: number;
-}
-
-interface IStartLocation extends Omit<ILocation, "day"> {}
-
-interface IExperience extends Document {
-  name: string;
-  slug: string;
-  duration: number;
-  maxGroupSize: number;
-  difficulty: "easy" | "medium" | "difficult";
-  ratingsAverage: number;
-  ratingsQuantity: number;
-  price: number;
-  priceDiscount?: number;
-  summary: string;
-  description?: string;
-  cover: string;
-  images: string[];
-  createdAt: Date;
-  startDates: Date[];
-  secretExperience: boolean;
-  durationWeeks: number;
-  startLocation: IStartLocation;
-  locations: ILocation[];
-  guides: (Types.ObjectId | IUser)[];
-}
 
 const ExperienceSchema: Schema<IExperience> = new Schema(
   {

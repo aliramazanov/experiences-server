@@ -1,21 +1,6 @@
-import mongoose, { Document, Model, Query, Schema, Types } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
+import { IReview, IReviewModel } from "../@types/review-schema-interface.js";
 import { Experience } from "./experience.model.js";
-
-interface IReview extends Document {
-  review: string;
-  rating?: number;
-  createdAt: Date;
-  experience: Types.ObjectId;
-  user: Types.ObjectId;
-}
-
-interface IReviewModel extends Model<IReview> {
-  calculateAverageRating(experienceId: Types.ObjectId): Promise<void>;
-}
-
-interface IReviewQuery extends Query<any, any> {
-  r?: IReview;
-}
 
 const ReviewSchema: Schema<IReview> = new Schema(
   {
@@ -52,13 +37,16 @@ const ReviewSchema: Schema<IReview> = new Schema(
 ReviewSchema.index({ experience: 1, user: 1 }, { unique: true });
 
 // Populating user names and photos on reviews
-ReviewSchema.pre<Query<IReview, IReview>>(/^find/, function (next) {
-  this.populate({
-    path: "user",
-    select: "name photo",
-  });
-  next();
-});
+ReviewSchema.pre(
+  /^find/,
+  function (this: mongoose.Query<IReview[], IReview>, next) {
+    this.populate({
+      path: "user",
+      select: "name photo",
+    });
+    next();
+  }
+);
 
 ReviewSchema.statics.calculateAverageRating = async function (
   experienceId: Types.ObjectId
@@ -89,30 +77,31 @@ ReviewSchema.statics.calculateAverageRating = async function (
   }
 };
 
-ReviewSchema.pre<IReview>("save", async function (next) {
+// Use `IReviewModel` for the constructor context
+ReviewSchema.pre<IReview>("save", async function (this: IReview, next) {
   await (this.constructor as IReviewModel).calculateAverageRating(
     this.experience
   );
-
   next();
 });
 
-ReviewSchema.pre<IReviewQuery>("findOneAndUpdate", async function (next) {
-  this.r = await this.findOne();
-  next();
-});
-
-ReviewSchema.post<IReviewQuery>("findOneAndUpdate", async function () {
-  if (this.r) {
-    await (this.r.constructor as IReviewModel).calculateAverageRating(
-      this.r.experience
-    );
+// Correct pre hook type for `findOneAndUpdate`
+ReviewSchema.pre(
+  "findOneAndUpdate",
+  async function (this: mongoose.Query<IReview | null, IReview>, next) {
+    const docToUpdate = await this.model.findOne(this.getQuery());
+    if (docToUpdate) {
+      await (docToUpdate.constructor as IReviewModel).calculateAverageRating(
+        docToUpdate.experience
+      );
+    }
+    next();
   }
-});
+);
 
 const Review: IReviewModel = mongoose.model<IReview, IReviewModel>(
   "Review",
   ReviewSchema
 );
 
-export { IReview, Review };
+export { Review };

@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import BaseController from "./base.controller.js";
 import { IUser, User } from "../models/user.model.js";
-import asyncErrorWrapper from "../utils/async-error-wrapper.js";
 import ApplicationError from "../utils/application-errors-handler.js";
+import asyncErrorWrapper from "../utils/async-error-wrapper.js";
 import { filterObjectValues } from "../utils/general-helpers.js";
+import BaseController from "./base.controller.js";
 
 class UserController {
   public getAllUsers = asyncErrorWrapper(
@@ -29,8 +29,8 @@ class UserController {
 
       const updatedFields = filterObjectValues(req.body, "name", "email");
 
-      if (req.file) {
-        updatedFields.photo = req.file.filename;
+      if ((req as any).file) {
+        updatedFields.photo = (req as any).file.filename;
       }
 
       const updatedUser = await User.findById(

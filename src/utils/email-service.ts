@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import { EmailUser } from "../@types/email-service";
+import { EmailUser } from "../@types/email-service.js";
 
 class EmailService {
   private to: string;

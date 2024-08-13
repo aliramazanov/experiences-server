@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
+import { IReview } from "../@types/review-schema-interface.js";
+import { Review } from "../models/review.model.js";
 import BaseController from "./base.controller.js";
-import { IReview, Review } from "../models/reviewModel.js";
 
 class ReviewController {
   public setIds = (req: Request, _res: Response, next: NextFunction) => {

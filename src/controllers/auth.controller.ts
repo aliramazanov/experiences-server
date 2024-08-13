@@ -1,12 +1,12 @@
 import crypto from "crypto";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { EmailUser } from "../@types/email-service.js";
 import { IUser, User } from "../models/user.model.js";
 import ApplicationError from "../utils/application-errors-handler.js";
 import asyncErrorWrapper from "../utils/async-error-wrapper.js";
 import EmailService from "../utils/email-service.js";
 import { emailRegex } from "../utils/general-helpers.js";
-import { EmailUser } from "../@types/email-service.js";
 
 class AuthController {
   private static generateToken(userId: string): string {

@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { Document, Model } from "mongoose";
 import BaseService from "../services/base.service.js";
-import asyncErrorWrapper from "../utils/async-error-wrapper.js";
 import ApplicationError from "../utils/application-errors-handler.js";
+import asyncErrorWrapper from "../utils/async-error-wrapper.js";
 
 class BaseController {
   public createOne = <T extends Document>(Model: Model<T>) =>

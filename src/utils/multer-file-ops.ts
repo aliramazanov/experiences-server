@@ -1,14 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import multer, { FileFilterCallback } from "multer";
 import sharp from "sharp";
-import asyncErrorWrapper from "./async-error-wrapper";
-import ApplicationError from "./application-errors-handler";
-
-export interface MulterRequest extends Request {
-  user?: any;
-  file?: Express.Multer.File;
-  files?: { [fieldname: string]: Express.Multer.File[] };
-}
+import ApplicationError from "./application-errors-handler.js";
+import asyncErrorWrapper from "./async-error-wrapper.js";
+import { MulterRequest } from "../@types/multer-request.js";
 
 const multerStorage = multer.memoryStorage();
 

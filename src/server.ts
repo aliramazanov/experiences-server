@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import http from "http";
 import mongoose from "mongoose";
 import app from "./app.js";
-import checkEnvVariables from "./utils/checkenv.js";
+import checkEnvVariables from "./utils/check-environment-variables.js";
 
 dotenv.config({ path: "./config.env" });
 

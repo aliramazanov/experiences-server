@@ -1,12 +1,12 @@
 import express from "express";
+import AuthController from "../controllers/auth.controller.js";
 import ExperienceController from "../controllers/experience.controller.js";
 import protect from "../middlewares/protect.middleware.js";
-import reviewRouter from "./reviews.router.js";
-import AuthController from "../controllers/auth.controller.js";
 import {
   resizeExperienceImages,
   uploadExperienceImages,
 } from "../utils/multer-file-ops.js";
+import reviewRouter from "./reviews.router.js";
 
 const router = express.Router();
 router.use(protect);

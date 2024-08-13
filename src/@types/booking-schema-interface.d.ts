@@ -1,3 +1,5 @@
+import { Document, Types } from "mongoose";
+
 export interface IBooking extends Document {
   booking: string;
   price: number;

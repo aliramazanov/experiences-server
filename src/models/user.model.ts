@@ -1,25 +1,8 @@
-import mongoose, { CallbackError, Document, Model, Schema } from "mongoose";
-import validator from "validator";
 import bcryptjs from "bcryptjs";
 import crypto from "crypto";
-
-interface IUser extends Document {
-  username: string;
-  firstname: string;
-  lastname: string;
-  email: string;
-  photo?: string;
-  role: string;
-  password: string;
-  confirmPassword: string | null;
-  checkPassword(candidate: string, initial: string): Promise<boolean>;
-  passwordChangedAt?: Date;
-  changedPasswordAfter(JWTstamp: any): boolean;
-  createPasswordResetToken(): string;
-  passwordResetToken: string | null;
-  passwordResetExpires: Date | null;
-  active: boolean;
-}
+import mongoose, { CallbackError, Model, Schema } from "mongoose";
+import validator from "validator";
+import { IUser } from "../@types/user-schema.js";
 
 const UserSchema: Schema<IUser> = new Schema({
   username: {
@@ -88,7 +71,7 @@ const UserSchema: Schema<IUser> = new Schema({
 
 // MongoDB Hooks
 
-UserSchema.pre<IUser>("save", async function (next) {
+UserSchema.pre<IUser>("save", async function (this: IUser, next) {
   if (!this.isModified("password")) {
     return next();
   }
@@ -104,7 +87,7 @@ UserSchema.pre<IUser>("save", async function (next) {
   }
 });
 
-UserSchema.pre<IUser>("save", async function (next) {
+UserSchema.pre<IUser>("save", function (this: IUser, next) {
   if (!this.isModified("password") || this.isNew) {
     return next();
   }
@@ -158,4 +141,4 @@ UserSchema.methods.createPasswordResetToken = function () {
 
 const User: Model<IUser> = mongoose.model<IUser>("User", UserSchema);
 
-export { User, IUser };
+export { IUser, User };
